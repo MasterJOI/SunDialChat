@@ -25,14 +25,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	//Бин для хешировщика паролей(можно подключать в любом месте)
-	@Bean
-	public PasswordEncoder getPasswordEncoder() {
-		//strength - надежность ключа
-		return new BCryptPasswordEncoder(8);
-	}
-
-
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
