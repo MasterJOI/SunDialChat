@@ -1,6 +1,7 @@
 package ua.masterjoi.sundial.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +26,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${hostname}")
+    private String hostname;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -64,10 +68,11 @@ public class UserService implements UserDetailsService {
                     "Dear, %s! \n" +
                             "Thank you for creating your SunDialChat Account!\n" +
                             "To complete your registration, click the link below:\n" +
-                            "http://localhost:8080/activate/%s \n" +
+                            "http://%s/activate/%s \n" +
                             "Yours truly,\n" +
                             "The SunDialChat Team :)",
                     user.getUsername(),
+                    hostname,
                     user.getActivationCode()
             );
             notificationService.send(user.getEmail(), "Activation code", message);
