@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
@@ -94,6 +96,19 @@ public class MainController {
         model.addAttribute("messages", messages);
 
         return "main";
+    }
+
+    @GetMapping("/user-messages/{user}")
+    public String userMessages(
+            /*Принимает текущего пользователя из сессии и запрашиваемый пользователь(из url запроса)*/
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable User user,
+            Model model
+    ) {
+        Set<Message> messages = user.getMessages();
+        model.addAttribute("messages", messages);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        return "userMessages";
     }
 
     /*  Не нужно, так как фильтруем все на одной странице main
