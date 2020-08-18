@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ua.masterjoi.sundial.models.Message;
 import ua.masterjoi.sundial.models.User;
 import ua.masterjoi.sundial.repositories.MessageRepository;
+import ua.masterjoi.sundial.services.FileService;
 
 import javax.validation.Valid;
 import java.io.File;
@@ -29,9 +31,9 @@ public class MainController {
     @Autowired
     private MessageRepository messageRepository;
 
-    //Value - указіваем Spring что хотим получить переменную upload.path (будет искать в properies)
-    @Value("${upload.path}")
-    private String uploadPath;
+    @Autowired
+    private FileService fileService;
+
 
     @GetMapping("/")
     public String greeting(Map<String, Long> model ) {
@@ -72,21 +74,7 @@ public class MainController {
             model.mergeAttributes(errorsMap);
             model.addAttribute("message", message);
         } else {
-            if (file != null && !file.getOriginalFilename().isEmpty()) {
-                File uploadDir = new File(uploadPath);
-                //Проверка если нету дериктории для загрузки, то мы ее создадим
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdir();
-                }
-                //Обезопасимя от колизий и создадим для каждого файла уникальное имя
-                String uuidFile = UUID.randomUUID().toString();
-                String resultFilename = uuidFile + "." + file.getOriginalFilename();
-
-                //Загружаем файл
-                file.transferTo(new File(uploadPath + "/" + resultFilename));
-
-                message.setFilename(resultFilename);
-            }
+            fileService.saveFile(message, file);
             model.addAttribute("message", null);
             messageRepository.save(message);
         }
@@ -98,18 +86,6 @@ public class MainController {
         return "main";
     }
 
-    @GetMapping("/user-messages/{user}")
-    public String userMessages(
-            /*Принимает текущего пользователя из сессии и запрашиваемый пользователь(из url запроса)*/
-            @AuthenticationPrincipal User currentUser,
-            @PathVariable User user,
-            Model model
-    ) {
-        Set<Message> messages = user.getMessages();
-        model.addAttribute("messages", messages);
-        model.addAttribute("isCurrentUser", currentUser.equals(user));
-        return "userMessages";
-    }
 
     /*  Не нужно, так как фильтруем все на одной странице main
     @PostMapping("filter")

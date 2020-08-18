@@ -23,7 +23,7 @@ public class Message {
     @NotBlank(message = "Please, fill the message.")
     @Length(max = 2048, message = "Insert message too long(< 2kB).")
     private String text;
-    @Length(max = 255, message = "Insert tag too long(<255 symb).")
+    @Length(max = 25, message = "Insert tag too long(<255 symb).")
     private String tag;
 
     @ManyToOne(fetch = FetchType.EAGER) //Много сообщений у одного пользователя

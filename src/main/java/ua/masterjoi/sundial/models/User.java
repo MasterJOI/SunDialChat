@@ -11,9 +11,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
