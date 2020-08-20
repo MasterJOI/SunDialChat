@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -44,6 +45,32 @@ public class User implements UserDetails {
     //Каждый пользователь имеет set сообщений, указываем названия поля cascade - втоматически изменяет или удаляет строки в зависимой таблицу при изменениях в главной
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Message> messages;
+
+    /*Добавим поле пользователей ManyToMany для  списка подписчиков*/
+    @ManyToMany
+    @JoinTable(
+            //Название таблицы
+            name = "user_subscriptions",
+            //Берем что пользователь на которого мы подписываемся это канал
+            joinColumns = {@JoinColumn(name = "channel_id")},
+            //Наше роле - id подписчика
+            inverseJoinColumns = {@JoinColumn(name = "subscriber_id") }
+    )
+    //Сразу инициализируем чтоб не возникала NullPointerExeption
+    private Set<User> subscribers = new HashSet<>();
+
+    /*Добавим такое же поле что б хранить собственные подписки*/
+    @ManyToMany
+    @JoinTable(
+            //Название таблицы
+            name = "user_subscriptions",
+            //Поменяли местами subscriber_id и channel_id
+            joinColumns = {@JoinColumn(name = "subscriber_id")},
+
+            inverseJoinColumns = {@JoinColumn(name = "channel_id") }
+    )
+    //Сразу инициализируем чтоб не возникала NullPointerExeption
+    private Set<User> subscriptions = new HashSet<>();
 
     //Какие роли у пользователя
     //ElementCollection - будет хранить отдельную таблицу с Enum

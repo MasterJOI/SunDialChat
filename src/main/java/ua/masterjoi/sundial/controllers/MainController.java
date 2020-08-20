@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,11 +17,8 @@ import ua.masterjoi.sundial.repositories.MessageRepository;
 import ua.masterjoi.sundial.services.FileService;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @Controller
 public class MainController {
@@ -35,6 +30,11 @@ public class MainController {
     private FileService fileService;
 
 
+    @Value("${upload.path}")
+    private String uploadPath;
+
+
+
     @GetMapping("/")
     public String greeting(Map<String, Long> model ) {
         return "greeting";
@@ -43,7 +43,7 @@ public class MainController {
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter,
                        Model model) {
-        Iterable<Message> messages = messageRepository.findAll();
+        Iterable<Message> messages;
 
         if(filter != null && !filter.isEmpty()) {
             messages = messageRepository.findByTag(filter);

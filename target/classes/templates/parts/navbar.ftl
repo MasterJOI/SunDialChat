@@ -30,15 +30,8 @@
                     <a class="nav-link" href="/user/profile">Profile</a>
                 </li>
             </#if>
-            <#if !user??>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li>
-            </#if>
         </ul>
-        <div class="navbar-text mr-3 ">${name}</div>
-        <#if user??>
+        <div class="navbar-text mr-3"><#if user??>${name}<#else>Please, Sign In</#if></div>
             <@l.logout />
-        </#if>
     </div>
 </nav>

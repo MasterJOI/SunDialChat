@@ -1,7 +1,6 @@
 package ua.masterjoi.sundial.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,8 +37,18 @@ public class MessageController {
             @RequestParam(required = false) Message message
     ) {
         Set<Message> messages = user.getMessages();
+
         model.addAttribute("messages", messages);
         model.addAttribute("message", message);
+        //Для отображения имени пользователя
+        model.addAttribute("userChannel", user);
+        //Отображает число подписок на странице
+        model.addAttribute("subscriptionsCount", user.getSubscriptions().size());
+        //Отображает число подписчиков на странице
+        model.addAttribute("subscribersCount", user.getSubscribers().size());
+        //Определяем являеться ли текущий пользователь подписанным на странице другого(у пользователя берем его список подпищиков и ищем там текцщего пользователя)
+        model.addAttribute("isSubscriber", user.getSubscribers().contains(currentUser));
+
         model.addAttribute("isCurrentUser", currentUser.equals(user));
         return "userMessages";
     }
