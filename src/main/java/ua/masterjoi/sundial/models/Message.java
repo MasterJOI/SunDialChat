@@ -6,9 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import ua.masterjoi.sundial.models.util.MessageHelper;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -32,6 +35,17 @@ public class Message {
 
     private String filename;
 
+    //Делаем поле лайков где будет список пользователей которые нажали лайк
+    @ManyToMany
+    @JoinTable(
+            //Название таблицы
+            name = "message_likes",
+            //Где id сообщения связанно с id пользователя
+            joinColumns = { @JoinColumn(name = "message_id")},
+            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    private Set<User> likes = new HashSet<>();
+
     public Message(String text, String tag, User user) {
         this.text = text;
         this.tag = tag;
@@ -39,6 +53,6 @@ public class Message {
     }
 
     public String getAuthorName() {
-        return author != null ? author.getUsername() : "<none>";
+        return MessageHelper.getAuthorName(author);
     }
 }

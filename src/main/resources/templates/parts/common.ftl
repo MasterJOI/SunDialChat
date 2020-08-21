@@ -6,6 +6,8 @@
         <meta charset="UTF-8">
         <title>SunDialChat</title>
         <link rel="stylesheet" href="/static/style.css">
+        <#--Font awesome-->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
         <#--Указываем что браузер должен учитывать плотность пикселей на екране кстройства чтобы подбираь размер интерфейса-->
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 

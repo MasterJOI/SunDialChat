@@ -3,6 +3,10 @@ package ua.masterjoi.sundial.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import ua.masterjoi.sundial.models.Message;
 import ua.masterjoi.sundial.models.User;
+import ua.masterjoi.sundial.models.dto.MessageDto;
 import ua.masterjoi.sundial.repositories.MessageRepository;
 import ua.masterjoi.sundial.services.FileService;
+import ua.masterjoi.sundial.services.MessageService;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -29,6 +35,9 @@ public class MainController {
     @Autowired
     private FileService fileService;
 
+    @Autowired
+    private MessageService messageService;
+
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -42,17 +51,16 @@ public class MainController {
 
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter,
-                       Model model) {
-        Iterable<Message> messages;
+                       Model model,
+                       //Добавили атрибут для отображения длинного списка(указали как сортировать сообщения и в каком порядке выводить)
+                       @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable,
+                       /*Добавляем пользователя в контекст чтоб проверять лайкнул он сообщение или нет*/
+                       @AuthenticationPrincipal User user
+                       ) {
+        Page<MessageDto> page = messageService.messageList(pageable, filter, user);
 
-        if(filter != null && !filter.isEmpty()) {
-            messages = messageRepository.findByTag(filter);
-        }
-        else {
-            messages = messageRepository.findAll();
-        }
-
-        model.addAttribute("messages", messages);
+        model.addAttribute("page", page);
+        model.addAttribute("url", "/main");
         model.addAttribute("filter", filter);
         return "main";
     }
@@ -64,7 +72,12 @@ public class MainController {
             //Включает список аргументов и сообщения ошибок валидации всегда пишеться перед Model(иначе ошибки будет писать прямо на сайт)
             BindingResult bindingResult,
             Model model,
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam("file") MultipartFile file) throws IOException {
+
+        //Для page
+        Page<MessageDto> page;
+
         message.setAuthor(user);
 
         if(bindingResult.hasErrors()) {
@@ -79,9 +92,12 @@ public class MainController {
             messageRepository.save(message);
         }
 
-        Iterable<Message> messages = messageRepository.findAll();
+        page = messageRepository.findAll(pageable, user);
 
-        model.addAttribute("messages", messages);
+
+        //Заполняем поля для pageable
+        model.addAttribute("url", "/main");
+        model.addAttribute("page", page);
 
         return "main";
     }
