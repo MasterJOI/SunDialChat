@@ -44,10 +44,9 @@ public class MessageController {
             Model model,
             /*Для messageEditor, Spring берет автоматом из get запроса (но его может и небыть в запросе такчто зделали поле необязательным)*/
             @RequestParam(required = false) Message message,
-            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageble
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
-
-        Page<MessageDto> page = messageService.messageListForUser(pageble,currentUser, author);
+        Page<MessageDto> page = messageService.messageListForUser(pageable, author, currentUser);
 
         model.addAttribute("message", message);
         //Для отображения имени пользователя
@@ -77,6 +76,7 @@ public class MessageController {
             @RequestParam("text") String text,
             @RequestParam("tag") String tag,
             @RequestParam("file") MultipartFile file,
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable,
             Model model
     ) throws IOException {
         /*Проверка что пользователь может менять только свои сообщения*/

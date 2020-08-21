@@ -27,7 +27,7 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
             ") " +
             "from Message m left join m.likes ml " +
             "where m.tag = :tag " +
-            "group by m")
+            "group by m ")
     Page<MessageDto> findByTag(@Param("tag") String tag, Pageable pageable, @Param("user") User user);
 
 
@@ -39,7 +39,6 @@ public interface MessageRepository extends CrudRepository<Message, Long> {
             ") " +
             "from Message m left join m.likes ml " +
             "where m.author = :author " +
-            "group by m")
-
-    Page<MessageDto> findByUser(Pageable pageable, @Param("author") User author, @Param("user") User user);
+            "group by m ")
+    Page<MessageDto> findByUser(Pageable pageable, @Param("user") User user, @Param("author") User author);
 }
